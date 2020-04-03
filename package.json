@@ -1,0 +1,32 @@
+{
+  "name": "pineapple",
+  "version": "1.0.0",
+  "description": "advanced json object validator specially designed to validate user json input and return readable error messages",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qantra-io/pineapple.git"
+  },
+  "keywords": [
+    "json",
+    "validation",
+    "error message",
+    "input",
+    "json validatior"
+  ],
+  "author": "Bahi Hussein - Qantra.io",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/qantra-io/pineapple/issues"
+  },
+  "homepage": "https://github.com/qantra-io/pineapple#readme",
+  "dependencies": {
+    "debug": "^4.1.1"
+  },
+  "devDependencies": {
+    "qantra-juice": "^1.0.2"
+  }
+}
