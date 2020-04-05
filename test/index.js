@@ -52,8 +52,8 @@ let model     =   [
     {model: 'fullname', path: 'user.name'},
 ];
 
-describe('Result', function() {
-  describe('#indexOf()', function() {
+describe('Pineapple', function() {
+  describe('#validate()', function() {
 
     it('should not return an error on a valid fullname', function(done) {
 
