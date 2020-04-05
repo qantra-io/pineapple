@@ -4,7 +4,7 @@
   "description": "advanced json object validator specially designed to validate user json input and return readable error messages",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,8 @@
     "debug": "^4.1.1"
   },
   "devDependencies": {
-    "qantra-juice": "^1.0.2"
+    "expect.js": "^0.3.1",
+    "mocha": "^7.1.1",
+    "qantra-juice": "^1.0.3"
   }
 }

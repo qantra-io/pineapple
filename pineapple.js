@@ -92,6 +92,9 @@ class Pineapple {
 
   }
 
+  _regex(vo){
+    return (new RegExp(vo.regex).test(vo.propValue))
+  }
   /**
     items can be called only in a property of type Array
     items validation vector can be an array if the 'to be validated prop' is array of objects

@@ -1,140 +1,96 @@
-const validationModels = [
-  {model: 'name', label: 'your name', path: 'name.kill'},
-  {model: 'email', label: 'user email address', path: 'email'},
-  {model: 'date', path: 'birth'},
-  {model: 'gender',path: 'gender', required: false},
-  {model: 'language', path: 'language'},
-  {model: 'arrayOfStrings', path: 'info.skills'},
-  {model: 'address', path: 'shipping.address'},
-  {model: 'countries', path: 'shipping.country', required: true,
-    onError: {
-      required: `$label is required for a product to be shipped`,
-    }
-  },
-  {model: 'address', path: 'pick.location'},
-  {model: 'geo', path: 'geolocation', required: true},
-]
+
+const debug      = require('debug')('qantra:pineapple:test');
+const assert     = require('assert');
+const Juice      = require('qantra-juice');
+const Pineapple  = require('../pineapple');
+const expect     = require('expect.js');
+
+
+
+const charSets = {
+  lowercase: 'abcdefghijklmnopqrstuvwxyz',
+  uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  numbers: '1234567890',
+  special: '@%+!#$?:~'
+}
+
+const combos = {
+  'lowercase': ['lowercase'],
+  'uppercase': ['uppercase'],
+  'numbers': ['numbers'],
+  'alpha-numeric': ['lowercase','uppercase','numbers'],
+  'complex': ['lowercase','uppercase','numbers','special'],
+  'lowercase-alpha-numeric': ['lowercase', 'numbers'],
+  'uppercase-alpha-numeric': ['uppercase', 'numbers']
+}
+
+const templates = {
+  'valid-fullname': [{'alpha-numeric':8}, ' ', {'alpha-numeric': 5}],
+  'invalid-regex-fullname': [{'complex':8}, ' ', {'alpha-numeric': 5}],
+  'email': [
+    { 'lowercase-alpha-numeric': 10 },
+    '@gmail.com',
+  ],
+
+}
+
+let juice = new Juice(charSets, combos, templates);
+
+
+
 const validationSchema = [
-
     {
 
-        model: 'name',
+        model: 'fullname',
         required: true,
-        label: 'name',
+        label: 'Fullname',
         type: 'String',
-        length: {min: 1, max:2}
+        length: {min: 3, max:100},
+        regex: /^([a-zA-Z0-9\s]{3,100})$/,
 
     },
-    {
-        model: 'email',
-        label: 'email address',
-        required: true,
-        type: 'String',
-        length: {min:100, max:100},
-        regex:/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    },
-    {
-        model: 'date',
-        label: 'date',
-        required: false,
-        type: 'Number',
-        canParse: 'date'
-    },
-    {
-        model: 'gender',
-        required: true,
-        type: 'Number',
-        oneOf: ['male','female'],
-    },
-    {
-        model: 'language',
-        required: true,
-        type: 'String',
-        oneOf: ['en','ar'],
-    },
-    {
-        model: 'arrayOfStrings',
-        required: true,
-        type: 'Array',
-        items:{
-          type:'String',
-          length: {min:8, max:100}
-        }
-    },
-    {
-      model: 'geo',
-      required: true,
-      type: 'Array',
-      items: [
-        {
-          type: 'Array',
-          path: 'lat',
-          required: true,
-          items:{
-              type: 'String',
-              path: 'lat',
-              required: true,
-              length: 5
-          }
-        },
-        {
-          type: 'Array',
-          path: 'lng',
-          required: true,
-          items: [
-            {
-              type: 'String',
-              path: 'lng',
-              required: true,
-              length: 5
-            }
-          ]
-        }
-      ]
-    },
-    {
-        model: 'countries',
-        label: 'Countries',
-        type: 'String',
-        oneOf: ['egypt','oman','usa']
-    },
-    {
-        model: 'address',
-        label: 'shipping address',
-        type: 'String',
-        length: {min:8, max:100}
-    },
+
 
 ];
 
-const obj = {
-    name: 'bahi',
-    email: 'bahi.hussein@gmail.com',
-    gender: 'male',
-    birth: 1554112180214,
-    language: 1,
-
-    pick: {
-        location: 'Area 32, Zone 43'
-    },
-
-    info: {
-        skills: ['coding','eating', 'sleeping']
-    },
-
-    shipping: {
-        country: 'Egypt'
-    },
-    geolocation: [
-      {
-        lat:['a','e','e'],
-        lng:[{lng: '1'}]
-      }
-    ]
-};
-
 let pineapple = new Pineapple(validationSchema);
 
-let result = pineapple.validate(obj, validationModels);
+let model     =   [
+    {model: 'fullname', path: 'fullname'},
+];
 
-console.log(JSON.stringify(result))
+describe('Result', function() {
+  describe('#indexOf()', function() {
+
+    it('should not return an error on a valid fullname', function(done) {
+
+      let payload = { fullname: juice.model('valid-fullname') };
+      let errors = pineapple.validate(payload, model);
+
+      debug(payload);
+
+      expect(errors).to.be.an('array');
+      expect(errors).to.have.length(0);
+
+      done();
+
+    });
+
+    it('should return an error on an invalid regex fullname', function(done) {
+
+      let payload = { fullname: juice.model('invalid-regex-fullname') };
+      let errors = pineapple.validate(payload, model);
+
+      debug(payload);
+      debug('errors',errors);
+
+      expect(errors).to.be.an('array');
+      expect(errors).to.have.length(1);
+      expect(errors[0].log).to.equal('_regex');
+
+      done();
+
+    });
+
+  });
+});
