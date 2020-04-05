@@ -53,7 +53,7 @@ let model     =   [
 ];
 
 describe('Pineapple', function() {
-  describe('#validate()', function() {
+  describe('#validate() #regex', function() {
 
     it('should not return an error on a valid fullname', function(done) {
 
