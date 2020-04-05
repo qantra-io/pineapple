@@ -5,8 +5,6 @@ const Juice      = require('qantra-juice');
 const Pineapple  = require('../pineapple');
 const expect     = require('expect.js');
 
-
-
 const charSets = {
   lowercase: 'abcdefghijklmnopqrstuvwxyz',
   uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -31,12 +29,9 @@ const templates = {
     { 'lowercase-alpha-numeric': 10 },
     '@gmail.com',
   ],
-
 }
 
 let juice = new Juice(charSets, combos, templates);
-
-
 
 const validationSchema = [
     {
@@ -49,14 +44,12 @@ const validationSchema = [
         regex: /^([a-zA-Z0-9\s]{3,100})$/,
 
     },
-
-
 ];
 
 let pineapple = new Pineapple(validationSchema);
 
 let model     =   [
-    {model: 'fullname', path: 'fullname'},
+    {model: 'fullname', path: 'user.name'},
 ];
 
 describe('Result', function() {
@@ -64,7 +57,7 @@ describe('Result', function() {
 
     it('should not return an error on a valid fullname', function(done) {
 
-      let payload = { fullname: juice.model('valid-fullname') };
+      let payload = { user: {name: juice.model('valid-fullname') }};
       let errors = pineapple.validate(payload, model);
 
       debug(payload);
@@ -78,7 +71,7 @@ describe('Result', function() {
 
     it('should return an error on an invalid regex fullname', function(done) {
 
-      let payload = { fullname: juice.model('invalid-regex-fullname') };
+      let payload = { user: {name: juice.model('invalid-regex-fullname') }};
       let errors = pineapple.validate(payload, model);
 
       debug(payload);

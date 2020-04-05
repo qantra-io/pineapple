@@ -31,9 +31,18 @@ let pineapple = new Pineapple(validationSchema);  //create an instance with the 
 
 
 let errors = pineapple.validate(
-  { fullname: '@Ft~U64l 4o94V' },
-  {model: 'fullname', path: 'fullname'},
-  );
+  {
+    user: {
+      name: '@Ft~U64l 4o94V'
+    }
+  },
+
+  {
+    model: 'fullname',
+    path: 'user.name'
+  },
+
+);
 
 
 ```
@@ -42,13 +51,13 @@ console.log(errors) output
 
 ```
 [
-  {
-    label: 'Fullname',
-    path: 'fullname',
-    message: 'Fullname has invalid format',
-    log: '_regex',
-    errors: []
-  }
+ {
+   label: 'Fullname',
+   path: 'user.name',
+   message: 'Fullname has invalid format',
+   log: '_regex',
+   errors: []
+ }
 ]
 ```
 
