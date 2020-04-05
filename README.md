@@ -6,7 +6,7 @@ advanced json object validator specially designed to validate user json input an
 
 # Install
 
-npm install qantra-pineapple
+```npm install qantra-pineapple```
 
 # Simple Usuage
 
@@ -26,4 +26,36 @@ const validationSchema = [
 
     },
 ];
+
+let pineapple = new Pineapple(validationSchema);  //create an instance with the defined schema list
+
+
+let errors = pineapple.validate(
+  { fullname: '@Ft~U64l 4o94V' },
+  {model: 'fullname', path: 'fullname'},
+  );
+
+
+```
+
+console.log(errors) output
+
+```
+[
+  {
+    label: 'Fullname',
+    path: 'fullname',
+    message: 'Fullname has invalid format',
+    log: '_regex',
+    errors: []
+  }
+]
+```
+
+
+
+
+
+
+
 ```
