@@ -29,27 +29,22 @@ const validationSchema = [
 
 let pineapple = new Pineapple(validationSchema);  //create an instance with the defined schema list
 
+let userInput = {
+  user: {
+    name: '@Ft~U64l 4o94V'
+  }
+};
 
-let errors = pineapple.validate(
-  {
-    user: {
-      name: '@Ft~U64l 4o94V'
-    }
-  },
+let modelReference = {
+  model: 'fullname',
+  path: 'user.name'
+};
 
-  {
-    model: 'fullname',
-    path: 'user.name'
-  },
+let errors = pineapple.validate(userInput, modelReference);
 
-);
+console.log(errors);
 
-
-```
-
-console.log(errors) output
-
-```
+/**
 [
  {
    label: 'Fullname',
@@ -59,7 +54,9 @@ console.log(errors) output
    errors: []
  }
 ]
+*/
 ```
+
 
 
 
