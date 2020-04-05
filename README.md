@@ -44,6 +44,11 @@ let errors = pineapple.validate(userInput, modelReference);
 
 console.log(errors);
 
+```
+
+the error result
+
+```
 /**
 [
  {
@@ -57,11 +62,13 @@ console.log(errors);
 */
 ```
 
+# Validation Props
 
-
-
-
-
-
-
-```
+**label**: label is useful for returning a user readable message
+**type**: can be 'string', 'number', 'array', 'object', 'boolean'
+**required**: true or false
+**length**: can be a number or object length: 5 , length: {min: 10, max: 100}
+**regex**: takes a regex expression to match
+**oneOf**: array of string from which the user value must be included ['male','female']
+**canParse**: takes a string 'int' , 'date' , 'float' check if a value can be parsed.
+**items**: validates array items and takes an a validation model reference object if validating array of strings of validation models reference array if validating array of objects
