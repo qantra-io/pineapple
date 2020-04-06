@@ -76,7 +76,9 @@ class Pineapple {
     let vectorValue = vo.length;
     let propValue   = vo.propValue;
     //if data not array convert data to string
-    if(!this.isArray(propValue)) propValue = propValue.toString();
+    if(!this.isArray(propValue)) {
+      propValue = propValue.toString();
+    }
     //if the length vector type = number
     if(this.isNumber(vectorValue)) return (vectorValue == propValue.length);
 
@@ -91,18 +93,19 @@ class Pineapple {
     return valid;
 
   }
-
   _regex(vo){
     return (new RegExp(vo.regex).test(vo.propValue))
   }
+
   /**
     items can be called only in a property of type Array
     items validation vector can be an array if the 'to be validated prop' is array of objects
     items validation vector cab be an object if the 'to be validated prop' is array of strings or numbers
   */
   _items(vo){
-
     vo = JSON.parse(JSON.stringify(vo));
+
+    let result = true;
     let errorObject = null;
 
     if(vo.type == 'Array'){
@@ -111,7 +114,19 @@ class Pineapple {
         //call validate again
         for(let i=0; i<vo.propValue.length; i++){
           errorObject = this.validate(vo.propValue[i], vo.items);
-          if(errorObject)break;
+
+          /** because validating array of object recursively calls validate
+           * we need to reference back to the parent the index of errored item. so if the errorObject contains index
+           * it means that the index needs to be added to the parent log and
+           * the errorObject will be embedded in the errros property
+           */
+          if(errorObject && errorObject.length>0){
+            result = {
+              index: i.toString(),
+              errors: errorObject
+            }
+            break;
+          }
         }
 
       } else {
@@ -136,7 +151,10 @@ class Pineapple {
 
             errorObject = this.exec(valicationVectorName, newVO);
 
-            if(errorObject)break;
+            if(errorObject){
+              result = errorObject;
+              break;
+            }
           }
 
           if(errorObject)break;
@@ -146,7 +164,8 @@ class Pineapple {
     } else {
       throw Error(`Unable to validate items under path ${vo.path} because it is not an Array`);
     }
-    return (errorObject);
+
+    return (result);
   }
   _canParse(vo){
 
@@ -154,7 +173,7 @@ class Pineapple {
     let result = false;
     switch(vo.canParse){
         case 'date':
-            result = (new Date(v) !== "Invalid Date") && !this.isNaN(new Date(v));
+            result = (new Date(v) != "Invalid Date") && !this.isNaN(new Date(v));
             break;
         case 'int':
             result = (this.isNaN(parseInt(v)))?false:true;
@@ -195,16 +214,16 @@ class Pineapple {
   }
 
   /** creates the returned error object */
-  createErrorObj(validationVectorName, vo, errors=[]){
+  createErrorObj(validationVectorName, vo, result={}){
     let vv        = vo.vector || validationVectorName;
     let label     = vo.label || vo.path || '';
     let path      = vo.path;
-    let log       = `_${validationVectorName}`+ ((vo.index)?` @index(${vo.index})`:'');
+    let log       = `_${validationVectorName}`+ ((vo.index)?` @index(${vo.index})`:'') + ((result.index)?` @index(${result.index})`:'');
     let message   = ( (vo.onError && vo.onError[vv] )   || this.errorSchema.onError[vv] || '').replace(this.errorSchema.marker, label);
-    return {label, path, message, log, errors}
+    return {label, path, message, log, errors:result.errors||[]}
   }
 
-  /** excutes valid the proper validation functions */
+  /** if the excution is succesful it will return null */
   exec(validationVectorName, vo){
 
     let errorObject                 = null;
@@ -214,14 +233,15 @@ class Pineapple {
 
       if(method){
 
+        /** result can be true or false or object */
         let result = method.bind(this)(vo);
-
         if(!result){
           errorObject = this.createErrorObj(validationVectorName, vo);
-        } else if(this.isObject(result)){
-          //errorObject returned
+        } else if(this.isObject(result) && !result.index){
+          /** this is an error object that returns from a property that is not an array of objects */
           errorObject = result;
-        } else if(this.isArray(result)){
+        } else if(this.isObject(result) && result.index){
+          /** this an error object that returns from validating array of objects - includes an index property referencing to the parent the index of the errored ite, */
           errorObject = this.createErrorObj(validationVectorName, vo, result);
         }
 
@@ -269,6 +289,7 @@ class Pineapple {
 
       let validationVectorName = validationVectors[i];
       errorObject = this.exec(validationVectorName, vo);
+
       if(errorObject)break;
 
     }

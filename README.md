@@ -77,17 +77,47 @@ the error result
 ## items property validates items inside an array
 
 ```
-let pineapple = new Pineapple([
+
+//validation schema
+let validationModels = [
   {
-    model: 'skills'
-    type: 'array',
+    model: 'skills',
+    type: 'Array',
     length: {min: 1, max:5}, //from one to five skills only allowed
     //because the expected object is array of strings then the items property is a validation object
     items: {
       type: 'string', //items inside the array must be string,
-      length: {min: 3, max: 30}, // character length of the items
-      
-
+      length: {min: 3, max: 6}, // character length of the items
     }
   }
-  ])
+]
+
+// user object
+let userInput = {
+  user: {
+    skills: ['coding','drawing']
+  }
+}
+
+
+//model reference
+let modelReference = [
+  { model: 'skills', path: 'user.skills'}
+]
+
+let pineapple = new Pineapple(validationModels);
+
+let result = pineapple.validate(userInput, modelReference);
+
+```
+
+console.log(result)
+
+```
+[ { label: 'user.skills',
+    path: 'user.skills',
+    message: 'one of the user.skills items is invalid',
+    log: '_length @index(1)',
+    errors: [] } ]
+
+```
