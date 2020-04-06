@@ -724,31 +724,23 @@ describe('Pineapple Model #8', function() {
 
   let validationSchema= [
     {
-      model: 'geo',
-      required: true,
+      model:'geo',
       type: 'Array',
       items: [
         {
+          path: 'lat',
           type: 'Array',
-          path: 'user.geo[0].lat',
-          required: true,
-          items:{
-              type: 'String',
-              path: 'lat',
-              required: true,
-              length: 5
+          items: {
+            type: 'String'
           }
         },
         {
+          path: 'lng',
           type: 'Array',
-          path: 'user.geo[0].lng',
-          required: true,
           items: [
             {
-              type: 'String',
               path: 'lng',
-              required: true,
-              length: 5
+              type: 'String',
             }
           ]
         }
@@ -766,11 +758,15 @@ describe('Pineapple Model #8', function() {
 
     it('should not return an error on an existed location', function(done) {
 
-      let payload = { user: {geo: [ {
-        lat:['aaaaa','eaaaa','eaaaa'],
-        lng:[{lng: '1hhhf'}]
+      let payload = {
+        user: {
+          geo: [
+            {
+              lat:['aaaaa','eaaaa','eaaaa'],
+              lng:[{lng: '1hhhf'}]
+            }
+          ]
         }
-     ]}
    };
       let errors = pineapple.validate(payload, model);
       debug(payload);
