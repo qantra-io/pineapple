@@ -835,7 +835,7 @@ describe('Pineapple Model #8', function() {
       debug('errors',errors);
       expect(errors).to.be.an('array');
       expect(errors).to.have.length(1);
-      expect(errors[0].log).to.equal('_item');
+      expect(errors[0].log).to.equal('_items @index(0)');
       done();
     });
 
@@ -843,7 +843,7 @@ describe('Pineapple Model #8', function() {
 
       let payload = { user: {geo: [ {
         lat:['aaaaa','eaaaa','eaaaa'],
-        lng:[{lng: '1hhhf'}]
+        lng:[{lng: '1hf'}]
         }
      ]}
    };
@@ -852,7 +852,7 @@ describe('Pineapple Model #8', function() {
       debug('errors',errors);
       expect(errors).to.be.an('array');
       expect(errors).to.have.length(1);
-      expect(errors[0].log).to.equal('_item');
+      expect(errors[0].log).to.equal('_items @index(1)');
       done();
     });
   });
