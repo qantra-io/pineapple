@@ -74,35 +74,114 @@ the error result
 * **items**: validates array items and takes an a validation model reference object if validating array of strings of validation models reference array if validating array of objects
 
 
-## items property validates items inside an array
+### Advanced Example
 
 ```
 
 //validation schema
 let validationModels = [
   {
+    model: 'name',
+    regex: /^([a-zA-Z0-9\s]{3,50})$/
+  },
+  {
+    model: 'mobile',
+    required: false,
+  },
+  {
+    model: 'age',
+    type: 'Number',
+  },
+  {
     model: 'skills',
     type: 'Array',
-    length: {min: 1, max:5}, //from one to five skills only allowed
-    //because the expected object is array of strings then the items property is a validation object
+    length: {max:5},
     items: {
-      type: 'string', //items inside the array must be string,
-      length: {min: 3, max: 6}, // character length of the items
+      type: 'String',
+      length: { min: 3, max: 50}
     }
+  },
+  {
+    model: 'gender',
+    type: 'String',
+    oneOf: ['male', 'female'],
+  },
+  {
+    model: 'books',
+    type: 'Array',
+    items: [
+
+      {
+        path: 'title',
+        type: 'String',
+        required: true,
+      },
+      {
+        path: 'prints',
+        type: 'Array',
+        items: [
+          {
+            path: 'country',
+            type: 'String',
+          },
+          {
+            path: 'release.date',
+            canParse: 'date'
+          }
+        ]
+      }
+
+    ]
   }
+
+
 ]
 
 // user object
 let userInput = {
   user: {
-    skills: ['coding','drawing']
+    name: 'bahi hussein',
+    age: '19',
+    skills: ['coding','drawing', 'ts'],
+    games: [
+      {title: 'outlast', score: 80},
+      {title: 'red alert', score: 100},
+    ],
+    gender: 'ninja',
+    books: [
+      {
+        title: 'bezzels',
+        prints: [
+          {
+            country: 'egypt',
+            release:{
+              date: 1586193356622
+            },
+          },
+          {
+            country: 'uk',
+            release:{
+              date: 'king toot'
+            },
+          }
+        ]
+      }
+    ],
+
+    adult: true,
+
   }
 }
 
 
 //model reference
 let modelReference = [
-  { model: 'skills', path: 'user.skills'}
+  { model: 'name', path: 'user.name'},
+  { model: 'mobile', path: 'user.mobile', required: true},
+  { model: 'age', path: 'user.age' },
+  { model: 'skills', path: 'user.skills' },
+  { model: 'gender', path: 'user.gender' },
+  { model: 'books',  path: 'user.books' },
 ]
 
 let pineapple = new Pineapple(validationModels);
@@ -111,13 +190,71 @@ let result = pineapple.validate(userInput, modelReference);
 
 ```
 
-console.log(result)
+console.log(JSON.stringify(result))
 
 ```
-[ { label: 'user.skills',
-    path: 'user.skills',
-    message: 'one of the user.skills items is invalid',
-    log: '_length @index(1)',
-    errors: [] } ]
+[
+   {
+      "label":"user.mobile",
+      "path":"user.mobile",
+      "message":"user.mobile is required",
+      "log":"_required",
+      "errors":[
+
+      ]
+   },
+   {
+      "label":"user.age",
+      "path":"user.age",
+      "message":"user.age invalid type",
+      "log":"_type",
+      "errors":[
+
+      ]
+   },
+   {
+      "label":"user.skills",
+      "path":"user.skills",
+      "message":"one of the user.skills items is invalid",
+      "log":"_length @index(2)",
+      "errors":[
+
+      ]
+   },
+   {
+      "label":"user.gender",
+      "path":"user.gender",
+      "message":"user.gender invalid option",
+      "log":"_oneOf",
+      "errors":[
+
+      ]
+   },
+   {
+      "label":"user.books",
+      "path":"user.books",
+      "message":"one of the user.books items is invalid",
+      "log":"_items @index(0)",
+      "errors":[
+         {
+            "label":"prints",
+            "path":"prints",
+            "message":"one of the prints items is invalid",
+            "log":"_items @index(1)",
+            "errors":[
+               {
+                  "label":"release.date",
+                  "path":"release.date",
+                  "message":"release.date invalid parsing",
+                  "log":"_canParse",
+                  "errors":[
+
+                  ]
+               }
+            ]
+         }
+      ]
+   }
+]
 
 ```
