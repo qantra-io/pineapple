@@ -39,7 +39,7 @@ const templates = {
 let juice = new Juice(charSets, combos, templates);
 
 
-// validation of format (regex)
+// fisrt model
 describe('Pineapple Model #1', function() {
 
   let validationSchema = [
@@ -61,7 +61,6 @@ describe('Pineapple Model #1', function() {
       {model: 'fullname', path: 'user.name'},
   ];
 
-  //Regex Validation
   describe('#validate() #regex', function() {
 
     it('should not return an error on a valid fullname', function(done) {
@@ -177,34 +176,34 @@ describe('Pineapple Model #1', function() {
 
 
 
-// SECOND SCHEMA TESTING
+// second model
 
-const validationSchemaTwo = [
-    {
+describe('Pineapple Model #2', function() {
 
-        model: 'email',
-        required: true,
-        label: 'Email',
-        type: 'String',
-        length: {min: 12, max:25},
-        regex:/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    },
-];
+  let validationSchema = [
+      {
 
-let pineappleTwo = new Pineapple(validationSchemaTwo);
+          model: 'email',
+          required: true,
+          label: 'Email',
+          type: 'String',
+          length: {min: 12, max:25},
+          regex:/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      },
+  ];
 
-let modelTwo     =   [
-    {model: 'email', path: 'user.email'},
-];
+  let pineapple = new Pineapple(validationSchema);
 
-// validation of format (regex)
-describe('pineappleTwo', function() {
+  let model     =   [
+      {model: 'email', path: 'user.email'},
+  ];
+
   describe('#validate() #regex', function() {
 
     it('should not return an error on a valid email', function(done) {
 
       let payload = { user: {email: juice.model('valid-email') }};
-      let errors = pineappleTwo.validate(payload, modelTwo);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       expect(errors).to.be.an('array');
       expect(errors).to.have.length(0);
@@ -215,7 +214,7 @@ describe('pineappleTwo', function() {
     it('should return an error on an invalid regex email', function(done) {
 
       let payload = { user: {email: juice.model('invalid-regex-email') }};
-      let errors = pineappleTwo.validate(payload, modelTwo);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -224,16 +223,13 @@ describe('pineappleTwo', function() {
       done();
     });
   });
-});
 
-// validation of require
-describe('PineappleTwo', function() {
   describe('#validate() #require', function() {
 
     it('should return an error on an empty input ', function(done) {
 
       let payload = { user: {email:''}};
-      let errors = pineappleTwo.validate(payload, modelTwo);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -242,16 +238,13 @@ describe('PineappleTwo', function() {
       done();
     });
   });
-});
 
-// validation of length
-describe('pineappleTwo', function() {
   describe('#validate() #length', function() {
 
     it('should return an error on an invalid length email', function(done) {
 
       let payload = { user: {email: juice.model('invalid-length-email') }};
-      let errors = pineappleTwo.validate(payload, modelTwo);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -260,16 +253,13 @@ describe('pineappleTwo', function() {
       done();
     });
   });
-});
 
-// validation of type
-describe('pineappleTwo', function() {
   describe('#validate() #type', function() {
 
     it('should return an error on a numeric input', function(done) {
 
       let payload = { user: {email: 1006 }};
-      let errors = pineappleTwo.validate(payload, modelTwo);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -281,7 +271,7 @@ describe('pineappleTwo', function() {
     it('should return an error on a boolean input', function(done) {
 
       let payload = { user: {email: true }};
-      let errors = pineappleTwo.validate(payload, modelTwo);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -293,7 +283,7 @@ describe('pineappleTwo', function() {
     it('should return an error on an input array ', function(done) {
 
       let payload = { user: {email: juice.model('valid-email').split("") }};
-      let errors = pineappleTwo.validate(payload, modelTwo);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -304,31 +294,32 @@ describe('pineappleTwo', function() {
   });
 });
 
-// THIRD SCHEMA TESTING
 
-const validationSchemaThree = [
-    {
-      model: 'gender',
-      required: true,
-      type: 'String',
-      oneOf: ['male','female']
-    },
-];
+// third model
 
-let pineappleThree = new Pineapple(validationSchemaThree);
+describe('Pineapple Model #3', function() {
 
-let modelThree     =   [
-    {model: 'gender', path: 'user.gender'},
-];
+  let validationSchema = [
+      {
+        model: 'gender',
+        required: true,
+        type: 'String',
+        oneOf: ['male','female']
+      },
+  ];
 
-// validation of requirement
-describe('pineappleThree', function() {
+  let pineapple = new Pineapple(validationSchema);
+
+  let model    =   [
+      {model: 'gender', path: 'user.gender'},
+  ];
+
   describe('#validate() #require', function() {
 
     it('should not return error on an existed gendr', function(done) {
 
       let payload = { user: {gender: "female"}};
-      let errors = pineappleThree.validate(payload, modelThree);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       expect(errors).to.be.an('array');
       expect(errors).to.have.length(0);
@@ -339,7 +330,7 @@ describe('pineappleThree', function() {
     it('should return an error on an empty input', function(done) {
 
       let payload = { user: {gender: "" }};
-      let errors = pineappleTwo.validate(payload, modelThree);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -348,16 +339,13 @@ describe('pineappleThree', function() {
       done();
     });
   });
-});
 
-// validation of type
-describe('pineappleThree', function() {
   describe('#validate() #type', function() {
 
     it('should return an error on an wrong input type ', function(done) {
 
-      let payload = { user: {gender: 0000 }};
-      let errors = pineappleTwo.validate(payload, modelThree);
+      let payload = { user: {gender: 12 }};
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -366,16 +354,13 @@ describe('pineappleThree', function() {
       done();
     });
   });
-});
 
-// validation of oneOf
-describe('pineappleThree', function() {
   describe('#validate() #oneOf', function() {
 
     it('should return an error on an wrong input type ', function(done) {
 
       let payload = { user: {gender: "males" }};
-      let errors = pineappleTwo.validate(payload, modelThree);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -386,32 +371,32 @@ describe('pineappleThree', function() {
   });
 });
 
-// FOURTH SCHEMA TESTING
+// fourth model
 
-const validationSchemaFour = [
-    {
-        model: 'language',
-        required: true,
-        type: 'String',
-        length: 2,
-        oneOf: ['en','ar'],
-    }
-];
+describe('Pineapple Model #4', function() {
 
-let pineappleFour = new Pineapple(validationSchemaFour);
+  let validationSchema= [
+      {
+          model: 'language',
+          required: true,
+          type: 'String',
+          length: 2,
+          oneOf: ['en','ar'],
+      }
+  ];
 
-let modelFour     =   [
-    {model: 'language', path: 'user.language'},
-];
+  let pineapple = new Pineapple(validationSchema);
 
-// validation of requirement
-describe('pineappleFour', function() {
+  let model    =   [
+      {model: 'language', path: 'user.language'},
+  ];
+
   describe('#validate() #require', function() {
 
     it('should not return error on an existed language', function(done) {
 
       let payload = { user: {language: "en"}};
-      let errors = pineappleFour.validate(payload, modelFour);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       expect(errors).to.be.an('array');
       expect(errors).to.have.length(0);
@@ -422,7 +407,7 @@ describe('pineappleFour', function() {
     it('should return an error on an empty input', function(done) {
 
       let payload = { user: {language: "" }};
-      let errors = pineappleFour.validate(payload, modelFour);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -431,16 +416,13 @@ describe('pineappleFour', function() {
       done();
     });
   });
-});
 
-// validation of type
-describe('pineappleFour', function() {
   describe('#validate() #type', function() {
 
     it('should return an error on an wrong input type ', function(done) {
 
       let payload = { user: {language: 12 }};
-      let errors = pineappleFour.validate(payload, modelFour);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -449,16 +431,13 @@ describe('pineappleFour', function() {
       done();
     });
   });
-});
 
-// validation of length
-describe('pineappleFour', function() {
   describe('#validate() #length', function() {
 
     it('should return an error on an invalied length of an input', function(done) {
 
       let payload = { user: {language: 'eng' }};
-      let errors = pineappleFour.validate(payload, modelFour);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -467,16 +446,13 @@ describe('pineappleFour', function() {
       done();
     });
   });
-});
 
-// validation of oneOf
-describe('pineappleFour', function() {
   describe('#validate() #oneOf', function() {
 
     it('should return an error on an wrong input type ', function(done) {
 
       let payload = { user: {language: "an" }};
-      let errors = pineappleFour.validate(payload, modelFour);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -488,32 +464,33 @@ describe('pineappleFour', function() {
 });
 
 
-// FOURTH SCHEMA TESTING
+// fifth model
 
-const validationSchemaFive = [
-    {
-        model: 'date',
-        label: 'date',
-        required: true,
-        type: 'Number',
-        canParse: 'date'
-    }
-];
 
-let pineappleFive = new Pineapple(validationSchemaFive);
+describe('Pineapple Model #5', function() {
 
-let modelFive     =   [
-  { model: 'date', path: 'user.date'}
-];
+  const validationSchema = [
+      {
+          model: 'date',
+          label: 'date',
+          required: true,
+          type: 'Number',
+          canParse: 'date'
+      }
+  ];
 
-// validation of requirement
-describe('pineappleFive', function() {
+  let pineapple = new Pineapple(validationSchema);
+
+  let model     =   [
+    { model: 'date', path: 'user.date'}
+  ];
+
   describe('#validate() #require', function() {
 
     it('should not return error on an existed date', function(done) {
 
       let payload = { user: {date: 6565258258528 }};
-      let errors = pineappleFive.validate(payload, modelFive);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       expect(errors).to.be.an('array');
       expect(errors).to.have.length(0);
@@ -524,7 +501,7 @@ describe('pineappleFive', function() {
     it('should return an error on an empty input', function(done) {
 
       let payload = { user: {date: 0 }};
-      let errors = pineappleFive.validate(payload, modelFive);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -533,16 +510,13 @@ describe('pineappleFive', function() {
       done();
     });
   });
-});
 
-// validation of type
-describe('pineappleFive', function() {
   describe('#validate() #type', function() {
 
     it('should return an error on an wrong input type ', function(done) {
 
       let payload = { user: {date: "474674676497649" }};
-      let errors = pineappleFive.validate(payload, modelFive);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -554,7 +528,7 @@ describe('pineappleFive', function() {
     it('should return an error on an wrong input type (boolean) ', function(done) {
 
       let payload = { user: {date: true }};
-      let errors = pineappleFive.validate(payload, modelFive);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -563,16 +537,13 @@ describe('pineappleFive', function() {
       done();
     });
   });
-});
 
-// validation of canParse
-describe('pineappleFive', function() {
   describe('#validate() #canParse', function() {
 
     it('should return an error on an input can not parse', function(done) {
 
       let payload = { user: {date: -6565258258528 }};
-      let errors = pineappleFive.validate(payload, modelFive);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -584,32 +555,32 @@ describe('pineappleFive', function() {
 });
 
 
-// sixth SCHEMA TESTING
+// sixth model
 
-const validationSchemaSix = [
-    {
-       model: 'countries',
-       label: 'Countries',
-       required: true,
-       type: 'String',
-       oneOf: ['egypt','oman','usa']
-   }
-];
+describe('Pineapple Model #6', function() {
 
-let pineappleSix = new Pineapple(validationSchemaSix);
+  let validationSchema = [
+      {
+         model: 'countries',
+         label: 'Countries',
+         required: true,
+         type: 'String',
+         oneOf: ['egypt','oman','usa']
+     }
+  ];
 
-let modelSix     =   [
-    {model: 'countries', path: 'user.countries'},
-];
+  let pineapple = new Pineapple(validationSchema);
 
-// validation of requirement
-describe('pineappleSix', function() {
+  let model     =   [
+      {model: 'countries', path: 'user.countries'},
+  ];
+
   describe('#validate() #require', function() {
 
     it('should not return error on an existed country', function(done) {
 
       let payload = { user: {countries: "usa"}};
-      let errors = pineappleSix.validate(payload, modelSix);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       expect(errors).to.be.an('array');
       expect(errors).to.have.length(0);
@@ -620,7 +591,7 @@ describe('pineappleSix', function() {
     it('should return an error on an empty input', function(done) {
 
       let payload = { user: {countries: "" }};
-      let errors = pineappleSix.validate(payload, modelSix);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -629,16 +600,13 @@ describe('pineappleSix', function() {
       done();
     });
   });
-});
 
-// validation of type
-describe('pineappleSix', function() {
   describe('#validate() #type', function() {
 
     it('should return an error on an wrong input type ', function(done) {
 
       let payload = { user: {countries: 12 }};
-      let errors = pineappleSix.validate(payload, modelSix);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -649,7 +617,7 @@ describe('pineappleSix', function() {
     it('should return an error on an wrong input type ', function(done) {
 
       let payload = { user: {countries: "usa".split() }};
-      let errors = pineappleSix.validate(payload, modelSix);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -658,17 +626,13 @@ describe('pineappleSix', function() {
       done();
     });
   });
-});
 
-
-// validation of oneOf
-describe('pineappleSix', function() {
   describe('#validate() #oneOf', function() {
 
     it('should return an error on an wrong input type ', function(done) {
 
       let payload = { user: {countries: "an" }};
-      let errors = pineappleSix.validate(payload, modelSix);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -679,32 +643,32 @@ describe('pineappleSix', function() {
   });
 });
 
-// SEVENTH SCHEMA TESTING
+// seventh model
 
-const validationSchemaSeven = [
-  {
-      model: 'address',
-      label: 'shipping address',
-      required: true,
-      type: 'String',
-      length: {min:10, max:40}
-  }
-];
+describe('Pineapple Model #7', function() {
 
-let pineappleSeven = new Pineapple(validationSchemaSeven);
+  let validationSchema = [
+    {
+        model: 'address',
+        label: 'shipping address',
+        required: true,
+        type: 'String',
+        length: {min:10, max:40}
+    }
+  ];
 
-let modelSeven     =   [
-    {model: 'address', path: 'user.address'},
-];
+  let pineapple = new Pineapple(validationSchema);
 
-// validation of requirement
-describe('pineappleSeven', function() {
+  let model     =   [
+      {model: 'address', path: 'user.address'},
+  ];
+
   describe('#validate() #require', function() {
 
     it('should not return error on an existed country', function(done) {
 
       let payload = { user: {address: juice.model('valid-address') }};
-      let errors = pineappleSeven.validate(payload, modelSeven);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       expect(errors).to.be.an('array');
       expect(errors).to.have.length(0);
@@ -715,7 +679,7 @@ describe('pineappleSeven', function() {
     it('should return an error on an empty input', function(done) {
 
       let payload = { user: {address: "" }};
-      let errors = pineappleSeven.validate(payload, modelSeven);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -724,16 +688,13 @@ describe('pineappleSeven', function() {
       done();
     });
   });
-});
 
-// validation of type
-describe('pineappleSeven', function() {
   describe('#validate() #type', function() {
 
     it('should return an error on an wrong input type', function(done) {
 
       let payload = { user: {address: 1276746 }};
-      let errors = pineappleSeven.validate(payload, modelSeven);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -744,7 +705,7 @@ describe('pineappleSeven', function() {
     it('should return an error on an wrong input type ', function(done) {
 
       let payload = { user: {address: juice.model('valid-address').split() }};
-      let errors = pineappleSeven.validate(payload, modelSeven);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -753,17 +714,13 @@ describe('pineappleSeven', function() {
       done();
     });
   });
-});
 
-
-// validation of length
-describe('pineappleSeven', function() {
   describe('#validate() #length', function() {
 
     it('should return an error on an invalid length below min ', function(done) {
 
       let payload = { user: {countries: "shash" }};
-      let errors = pineappleSeven.validate(payload, modelSeven);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -775,7 +732,7 @@ describe('pineappleSeven', function() {
     it('should return an error on an invalid length exceeds max ', function(done) {
 
       let payload = { user: {countries: juice.model('invalid-address') }};
-      let errors = pineappleSeven.validate(payload, modelSeven);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -786,50 +743,51 @@ describe('pineappleSeven', function() {
   });
 });
 
-// EIGHTH SCHEMA TESTING
 
-const validationSchemaEight= [
-  {
-    model: 'geo',
-    required: true,
-    type: 'Array',
-    items: [
-      {
-        type: 'Array',
-        path: 'user.geo[0].lat',
-        required: true,
-        items:{
-            type: 'String',
-            path: 'lat',
-            required: true,
-            length: 5
-        }
-      },
-      {
-        type: 'Array',
-        path: 'user.geo[0].lng',
-        required: true,
-        items: [
-          {
-            type: 'String',
-            path: 'lng',
-            required: true,
-            length: 5
+// eighth model
+
+describe('Pineapple Model #8', function() {
+
+  let validationSchema= [
+    {
+      model: 'geo',
+      required: true,
+      type: 'Array',
+      items: [
+        {
+          type: 'Array',
+          path: 'user.geo[0].lat',
+          required: true,
+          items:{
+              type: 'String',
+              path: 'lat',
+              required: true,
+              length: 5
           }
-        ]
-      }
-    ]
-  }
-];
+        },
+        {
+          type: 'Array',
+          path: 'user.geo[0].lng',
+          required: true,
+          items: [
+            {
+              type: 'String',
+              path: 'lng',
+              required: true,
+              length: 5
+            }
+          ]
+        }
+      ]
+    }
+  ];
 
-let pineappleEight = new Pineapple(validationSchemaEight);
+  let pineapple = new Pineapple(validationSchema);
 
-let modelEight     =   [
-  {model: 'geo', path: 'user.geo'},
-];
+  let model     =   [
+    {model: 'geo', path: 'user.geo'},
+  ];
 
-// validation of require
-describe('pineappleEight', function() {
   describe('#validate() #require', function() {
 
     it('should not return an error on an existed location', function(done) {
@@ -840,7 +798,7 @@ describe('pineappleEight', function() {
         }
      ]}
    };
-      let errors = pineappleEight.validate(payload, modelEight);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       expect(errors).to.be.an('array');
       expect(errors).to.have.length(0);
@@ -850,7 +808,7 @@ describe('pineappleEight', function() {
     it('should return an error on an empty input ', function(done) {
 
       let payload = { user: {geo:''}};
-      let errors = pineappleEight.validate(payload, modelEight);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -859,16 +817,13 @@ describe('pineappleEight', function() {
       done();
     });
   });
-});
 
-// validation of type
-describe('pineappleEight', function() {
   describe('#validate() #type', function() {
 
     it('should return an error on a string type input', function(done) {
 
       let payload = { user: {geo:'string'}};
-      let errors = pineappleEight.validate(payload, modelEight);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -880,7 +835,7 @@ describe('pineappleEight', function() {
     it('should return an error on a string type input', function(done) {
 
       let payload = { user: {geo: 090909}};
-      let errors = pineappleEight.validate(payload, modelEight);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -889,10 +844,7 @@ describe('pineappleEight', function() {
       done();
     });
   });
-});
 
-// validation of items
-describe('pineappleEight', function() {
   describe('#validate() #items', function() {
 
 
@@ -904,7 +856,7 @@ describe('pineappleEight', function() {
         }
      ]}
    };
-      let errors = pineappleEight.validate(payload, modelEight);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
@@ -921,7 +873,7 @@ describe('pineappleEight', function() {
         }
      ]}
    };
-      let errors = pineappleEight.validate(payload, modelEight);
+      let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
       expect(errors).to.be.an('array');
