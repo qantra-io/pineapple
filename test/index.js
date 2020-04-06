@@ -39,29 +39,29 @@ const templates = {
 let juice = new Juice(charSets, combos, templates);
 
 
-// FIRST SCHEMA TESTING
-
-const validationSchemaOne = [
-    {
-
-        model: 'fullname',
-        required: true,
-        label: 'Fullname',
-        type: 'String',
-        length: {min: 3, max:100},
-        regex: /^([a-zA-Z0-9\s]{3,100})$/,
-
-    },
-];
-
-let pineapple = new Pineapple(validationSchemaOne);
-
-let model     =   [
-    {model: 'fullname', path: 'user.name'},
-];
-
 // validation of format (regex)
-describe('Pineapple', function() {
+describe('Pineapple Model #1', function() {
+
+  let validationSchema = [
+      {
+
+          model: 'fullname',
+          required: true,
+          label: 'Fullname',
+          type: 'String',
+          length: {min: 3, max:100},
+          regex: /^([a-zA-Z0-9\s]{3,100})$/,
+
+      },
+  ];
+
+  let pineapple = new Pineapple(validationSchema);
+
+  let model     =   [
+      {model: 'fullname', path: 'user.name'},
+  ];
+
+  //Regex Validation
   describe('#validate() #regex', function() {
 
     it('should not return an error on a valid fullname', function(done) {
@@ -88,11 +88,9 @@ describe('Pineapple', function() {
 
     });
   });
-});
 
-// validation of require
-describe('Pineapple', function() {
-  describe('#validate() #require', function() {
+
+  describe('#validate() #required', function() {
 
     it('should return an error on an empty input ', function(done) {
 
@@ -107,10 +105,7 @@ describe('Pineapple', function() {
 
     });
   });
-});
 
-// validation of type
-describe('Pineapple', function() {
   describe('#validate() #type', function() {
 
     it('should return an error on a number input ', function(done) {
@@ -149,10 +144,7 @@ describe('Pineapple', function() {
       done();
     });
   });
-});
 
-// validation of length
-describe('Pineapple', function() {
   describe('#validate() #length', function() {
 
     it('should return an error on an input below min length requirements', function(done) {
@@ -179,7 +171,12 @@ describe('Pineapple', function() {
       done();
     });
   });
+
+
+
 });
+
+
 
 
 // SECOND SCHEMA TESTING

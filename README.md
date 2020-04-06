@@ -65,10 +65,29 @@ the error result
 # Validation Props
 
 * **label**: label is useful for returning a user readable message
-* **type**: can be 'string', 'number', 'array', 'object', 'boolean'
+* **type**: can be 'string', 'number', 'array', 'object', 'boolean', 'date'
 * **required**: true or false
 * **length**: can be a number or object length: 5 , length: {min: 10, max: 100}
 * **regex**: takes a regex expression to match
 * **oneOf**: array of string from which the user value must be included ['male','female']
 * **canParse**: takes a string 'int' , 'date' , 'float' check if a value can be parsed.
 * **items**: validates array items and takes an a validation model reference object if validating array of strings of validation models reference array if validating array of objects
+
+
+## items property validates items inside an array
+
+```
+let pineapple = new Pineapple([
+  {
+    model: 'skills'
+    type: 'array',
+    length: {min: 1, max:5}, //from one to five skills only allowed
+    //because the expected object is array of strings then the items property is a validation object
+    items: {
+      type: 'string', //items inside the array must be string,
+      length: {min: 3, max: 30}, // character length of the items
+      
+
+    }
+  }
+  ])
