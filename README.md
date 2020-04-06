@@ -82,6 +82,7 @@ the error result
 let validationModels = [
   {
     model: 'name',
+    label: 'Username',
     regex: /^([a-zA-Z0-9\s]{3,50})$/
   },
   {
@@ -90,10 +91,12 @@ let validationModels = [
   },
   {
     model: 'age',
+    label: 'Age',
     type: 'Number',
   },
   {
     model: 'skills',
+    label: 'User Skills',
     type: 'Array',
     length: {max:5},
     items: {
@@ -103,28 +106,35 @@ let validationModels = [
   },
   {
     model: 'gender',
+    label: 'Gender',
     type: 'String',
     oneOf: ['male', 'female'],
   },
   {
     model: 'books',
+    label: 'User Books',
     type: 'Array',
     items: [
 
       {
+        label: 'Book Title',
         path: 'title',
         type: 'String',
         required: true,
       },
       {
+        label: 'Prints',
         path: 'prints',
         type: 'Array',
         items: [
           {
+            label: 'Country',
             path: 'country',
             type: 'String',
+            required: true,
           },
           {
+            label: 'Release Date',
             path: 'release.date',
             canParse: 'date'
           }
@@ -176,8 +186,8 @@ let userInput = {
 
 //model reference
 let modelReference = [
-  { model: 'name', path: 'user.name'},
-  { model: 'mobile', path: 'user.mobile', required: true},
+  { model: 'name', path: 'user.name', label: 'Writer Name'},
+  { model: 'mobile', path: 'user.mobile', required: true,},
   { model: 'age', path: 'user.age' },
   { model: 'skills', path: 'user.skills' },
   { model: 'gender', path: 'user.gender' },
@@ -204,48 +214,48 @@ console.log(JSON.stringify(result))
       ]
    },
    {
-      "label":"user.age",
+      "label":"Age",
       "path":"user.age",
-      "message":"user.age invalid type",
+      "message":"Age invalid type",
       "log":"_type",
       "errors":[
 
       ]
    },
    {
-      "label":"user.skills",
+      "label":"User Skills",
       "path":"user.skills",
-      "message":"one of the user.skills items is invalid",
+      "message":"one of the User Skills items is invalid",
       "log":"_length @index(2)",
       "errors":[
 
       ]
    },
    {
-      "label":"user.gender",
+      "label":"Gender",
       "path":"user.gender",
-      "message":"user.gender invalid option",
+      "message":"Gender invalid option",
       "log":"_oneOf",
       "errors":[
 
       ]
    },
    {
-      "label":"user.books",
+      "label":"User Books",
       "path":"user.books",
-      "message":"one of the user.books items is invalid",
+      "message":"one of the User Books items is invalid",
       "log":"_items @index(0)",
       "errors":[
          {
-            "label":"prints",
+            "label":"Prints",
             "path":"prints",
-            "message":"one of the prints items is invalid",
+            "message":"one of the Prints items is invalid",
             "log":"_items @index(1)",
             "errors":[
                {
-                  "label":"release.date",
+                  "label":"Release Date",
                   "path":"release.date",
-                  "message":"release.date invalid parsing",
+                  "message":"Release Date invalid parsing",
                   "log":"_canParse",
                   "errors":[
 
