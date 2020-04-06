@@ -32,7 +32,8 @@ const templates = {
   'invalid-regex-email': [".", { 'lowercase': 3 }, '@gmail.com',],
   'invalid-length-email': [{ 'lowercase': 30 }, '@gmail.com',],
   'valid-address': [{'alpha-numeric': 20}],
-  'invalid-address': [{'alpha-numeric': 50}]
+  'invalid-address-max': [{'alpha-numeric': 50}],
+  'invalid-address-min': [{'alpha-numeric': 8}]
 
 }
 
@@ -719,7 +720,7 @@ describe('Pineapple Model #7', function() {
 
     it('should return an error on an invalid length below min ', function(done) {
 
-      let payload = { user: {countries: "shash" }};
+      let payload = { user: {address: juice.model('invalid-address-min') }};
       let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
@@ -731,7 +732,7 @@ describe('Pineapple Model #7', function() {
 
     it('should return an error on an invalid length exceeds max ', function(done) {
 
-      let payload = { user: {countries: juice.model('invalid-address') }};
+      let payload = { user: {address: juice.model('invalid-address-max') }};
       let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
