@@ -172,8 +172,6 @@ describe('Pineapple Model #1', function() {
     });
   });
 
-
-
 });
 
 
