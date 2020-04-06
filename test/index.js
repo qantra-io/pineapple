@@ -475,7 +475,6 @@ describe('Pineapple Model #5', function() {
           model: 'date',
           label: 'date',
           required: true,
-          type: 'Number',
           canParse: 'date'
       }
   ];
@@ -512,38 +511,12 @@ describe('Pineapple Model #5', function() {
     });
   });
 
-  describe('#validate() #type', function() {
-
-    it('should return an error on an wrong input type ', function(done) {
-
-      let payload = { user: {date: "474674676497649" }};
-      let errors = pineapple.validate(payload, model);
-      debug(payload);
-      debug('errors',errors);
-      expect(errors).to.be.an('array');
-      expect(errors).to.have.length(1);
-      expect(errors[0].log).to.equal('_type');
-      done();
-    });
-
-    it('should return an error on an wrong input type (boolean) ', function(done) {
-
-      let payload = { user: {date: true }};
-      let errors = pineapple.validate(payload, model);
-      debug(payload);
-      debug('errors',errors);
-      expect(errors).to.be.an('array');
-      expect(errors).to.have.length(1);
-      expect(errors[0].log).to.equal('_type');
-      done();
-    });
-  });
 
   describe('#validate() #canParse', function() {
 
     it('should return an error on an input can not parse', function(done) {
 
-      let payload = { user: {date: -6565258258528 }};
+      let payload = { user: {date: "7amada" }};
       let errors = pineapple.validate(payload, model);
       debug(payload);
       debug('errors',errors);
