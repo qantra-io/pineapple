@@ -725,22 +725,28 @@ describe('Pineapple Model #8', function() {
   let validationSchema= [
     {
       model:'geo',
+      required: true,
       type: 'Array',
       items: [
         {
           path: 'lat',
+          required: true,
           type: 'Array',
           items: {
-            type: 'String'
+            type: 'String',
+            length:5
           }
         },
         {
           path: 'lng',
+          required: true,
           type: 'Array',
           items: [
             {
               path: 'lng',
+              required: true,
               type: 'String',
+              length:5
             }
           ]
         }
@@ -818,10 +824,10 @@ describe('Pineapple Model #8', function() {
   describe('#validate() #items', function() {
 
 
-    it('should return an error on a lat item', function(done) {
+    it('should return an error on a lat item lengh ', function(done) {
 
       let payload = { user: {geo: [ {
-        lat:['aaaaa','eaaaa','eaaaa'],
+        lat:['aaa','eaaaa','eaaaa'],
         lng:[{lng: '1hhhf'}]
         }
      ]}
@@ -848,7 +854,7 @@ describe('Pineapple Model #8', function() {
       debug('errors',errors);
       expect(errors).to.be.an('array');
       expect(errors).to.have.length(1);
-      expect(errors[0].log).to.equal('_items @index(1)');
+      expect(errors[0].log).to.equal('_items @index(0)');
       done();
     });
   });
