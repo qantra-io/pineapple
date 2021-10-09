@@ -1,3 +1,3 @@
-const Pineapple = require('pineapple');
+const Pineapple = require('./pineapple');
 
 module.exports = Pineapple;
