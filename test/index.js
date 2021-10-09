@@ -2,7 +2,7 @@
 const debug      = require('debug')('qantra:pineapple:test');
 const assert     = require('assert');
 const Juice      = require('qantra-juice');
-const Pineapple  = require('../pineapple');
+const {Pineapple}  = require('../pineapple');
 const expect     = require('expect.js');
 
 const charSets = {
@@ -69,8 +69,9 @@ describe('Pineapple Model #1', function() {
       let payload = { user: {name: juice.model('valid-fullname') }};
       let errors = pineapple.validate(payload, model);
       debug(payload);
-      expect(errors).to.be.an('array');
-      expect(errors).to.have.length(0);
+      
+      expect(errors).to.be.an('boolean');
+      expect(errors).to.be.false;
       done();
 
     });
@@ -80,6 +81,7 @@ describe('Pineapple Model #1', function() {
       let payload = { user: {name: juice.model('invalid-regex-fullname') }};
       let errors = pineapple.validate(payload, model);
       debug(payload);
+      debug(model);
       debug('errors',errors);
       expect(errors).to.be.an('array');
       expect(errors).to.have.length(1);
@@ -206,8 +208,8 @@ describe('Pineapple Model #2', function() {
       let payload = { user: {email: juice.model('valid-email') }};
       let errors = pineapple.validate(payload, model);
       debug(payload);
-      expect(errors).to.be.an('array');
-      expect(errors).to.have.length(0);
+      expect(errors).to.be.an('boolean');
+      expect(errors).to.be.false;
       done();
 
     });
@@ -322,8 +324,8 @@ describe('Pineapple Model #3', function() {
       let payload = { user: {gender: "female"}};
       let errors = pineapple.validate(payload, model);
       debug(payload);
-      expect(errors).to.be.an('array');
-      expect(errors).to.have.length(0);
+      expect(errors).to.be.an('boolean');
+      expect(errors).to.be.false;
       done();
 
     });
@@ -399,8 +401,8 @@ describe('Pineapple Model #4', function() {
       let payload = { user: {language: "en"}};
       let errors = pineapple.validate(payload, model);
       debug(payload);
-      expect(errors).to.be.an('array');
-      expect(errors).to.have.length(0);
+      expect(errors).to.be.an('boolean');
+      expect(errors).to.be.false;
       done();
 
     });
@@ -492,8 +494,8 @@ describe('Pineapple Model #5', function() {
       let payload = { user: {date: 6565258258528 }};
       let errors = pineapple.validate(payload, model);
       debug(payload);
-      expect(errors).to.be.an('array');
-      expect(errors).to.have.length(0);
+      expect(errors).to.be.an('boolean');
+      expect(errors).to.be.false;
       done();
 
     });
@@ -556,8 +558,8 @@ describe('Pineapple Model #6', function() {
       let payload = { user: {countries: "usa"}};
       let errors = pineapple.validate(payload, model);
       debug(payload);
-      expect(errors).to.be.an('array');
-      expect(errors).to.have.length(0);
+      expect(errors).to.be.an('boolean');
+      expect(errors).to.be.false;
       done();
 
     });
@@ -644,8 +646,8 @@ describe('Pineapple Model #7', function() {
       let payload = { user: {address: juice.model('valid-address') }};
       let errors = pineapple.validate(payload, model);
       debug(payload);
-      expect(errors).to.be.an('array');
-      expect(errors).to.have.length(0);
+      expect(errors).to.be.an('boolean');
+      expect(errors).to.be.false;
       done();
 
     });
@@ -776,8 +778,8 @@ describe('Pineapple Model #8', function() {
    };
       let errors = pineapple.validate(payload, model);
       debug(payload);
-      expect(errors).to.be.an('array');
-      expect(errors).to.have.length(0);
+      expect(errors).to.be.an('boolean');
+      expect(errors).to.be.false;
       done();
     });
 

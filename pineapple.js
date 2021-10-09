@@ -19,11 +19,9 @@ const defaultErrorSchema = {
 class Pineapple {
 
   constructor(validationSchema=[], errorSchema = defaultErrorSchema){
-
     this.validationSchema  = validationSchema;
     this.errorSchema       = errorSchema;
     this.nonMethodVectors  = ['label','path','onError','propValue','model','required'];
-
   }
 
   //validation helpers
@@ -69,6 +67,8 @@ class Pineapple {
     } else { throw Error(`Unable to find method relevant with: ${typeName}`)}
   }
   _oneOf(vo){
+    if(vo.oneOf == "$options" && vo.options) vo.oneOf = vo.options.map(i=>i.value);
+    console.log(vo.oneOf)
     return vo.oneOf.includes(vo.propValue)
   }
   _length(vo){
@@ -108,12 +108,12 @@ class Pineapple {
     let result = true;
     let errorObject = null;
 
-    if(vo.type == 'Array'){
+    if(vo.type == 'array'|| vo.type == 'Array' ){
 
       if(this.isArray(vo.items)){
         //call validate again
         for(let i=0; i<vo.propValue.length; i++){
-          errorObject = this.validate(vo.propValue[i], vo.items);
+          errorObject = this.run(vo.propValue[i], vo.items);
 
           /** because validating array of object recursively calls validate
            * we need to reference back to the parent the index of errored item. so if the errorObject contains index
@@ -156,7 +156,6 @@ class Pineapple {
               break;
             }
           }
-
           if(errorObject)break;
         }
 
@@ -168,7 +167,6 @@ class Pineapple {
     return (result);
   }
   _canParse(vo){
-
     let v      = vo.propValue;
     let result = false;
     switch(vo.canParse){
@@ -193,7 +191,7 @@ class Pineapple {
 
     for (var i=0, path=path.split('.'), len=path.length; i<len; i++){
       var level = obj[path[i]];
-      if(!level)return false;
+      if(!level)return null;
       obj = level;
     };
     return obj;
@@ -210,7 +208,8 @@ class Pineapple {
 
   /** merge incoming model with baseModel */
   mergeModels(baseModel, inModel){
-    return lodash.merge(baseModel, inModel);
+    let merged = lodash.merge(baseModel, inModel);
+    return merged;
   }
 
   /** creates the returned error object */
@@ -256,7 +255,7 @@ class Pineapple {
   exports valid valdation vector names from the validation model
   **/
   getValidationVectors(vo){
-    return Object.keys(vo).filter(i=>!this.nonMethodVectors.includes(i));
+    return Object.keys(vo).filter(i=>this[`_${i}`]);
   }
 
   /**
@@ -272,16 +271,20 @@ class Pineapple {
     //mergine the global and the specific
     let vo                   = this.mergeModels(baseValidationModel, inValidationModel);
 
+    //fallback to key if pathnot found;
+    if(!vo.path)vo.path=vo.key;
     //items already have propValue
     vo.propValue = this.getDeepValue(obj, vo.path);
 
-    //check required firest
-    if(vo.required && !vo.propValue){
+    if(vo.required && (this.isNull(vo.propValue)||this.isUndefined(vo.propValue))){
       return this.createErrorObj('required', vo);
     }
+    //if not required and it is passed by null then we will not containue valudtion 
+    if(this.isNull(vo.propValue)||this.isUndefined(vo.propValue))return null;
 
     //remove non method vectors
     let validationVectors = this.getValidationVectors(vo);
+
 
     let errorObject       = null;
 
@@ -301,8 +304,8 @@ class Pineapple {
   /**
     Passes every property and its validation to the evaluate
   */
-  validate(obj, validationModels){
-     let errors = [];
+  run(obj, validationModels){
+    let errors = [];
      for(let i=0; i<validationModels.length; i++){
        let error = this.evaluate(obj, validationModels[i]);
        if(error)errors.push(error);
@@ -310,8 +313,23 @@ class Pineapple {
      return errors;
   }
 
+  validate(data, schema){
+    let errors = this.run(data, schema);
+    if(errors.length>0) return errors;
+    else return false;
+  }
+
+}
+
+exports.Pineapple = Pineapple;
+
+exports.validate = (data, schema)=>{
+  let p = new Pineapple();
+  let errors = p.run(data, schema);
+  if(errors.length>0) return errors;
+  else return false;
 }
 
 
 
-module.exports = Pineapple;
+
