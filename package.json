@@ -1,6 +1,6 @@
 {
   "name": "qantra-pineapple",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "advanced json object validator specially designed to validate user json input and return readable error messages",
   "main": "index.js",
   "scripts": {
@@ -24,11 +24,12 @@
   },
   "homepage": "https://github.com/qantra-io/pineapple#readme",
   "dependencies": {
-    "debug": "^4.1.1"
+    "debug": "^4.1.1",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
-    "mocha": "^7.1.1",
+    "mocha": "^9.1.2",
     "qantra-juice": "^1.0.3"
   }
 }
