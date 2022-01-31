@@ -4,7 +4,7 @@ const assert     = require('assert');
 const juice      = require('./juice');
 const {validate}  = require('..');
 const expect     = require('expect.js');
-
+ 
 let schema = [
   {
       label: 'Created By',

@@ -1,3 +1,5 @@
+const { load } = require('debug/src/browser');
+const { times } = require('lodash');
 const lodash = require('lodash');
 const debug  = require('debug')('qantra:pineapple');
 
@@ -23,12 +25,13 @@ module.exports = class Pineapple {
     models=[], 
     errorSchema = defaultErrorSchema,
     customValidators = {},
-  }){
-    this.models              = models;
+  }={}){
+    this.models              = models || {};
     this.errorSchema         = errorSchema;
     this.nonMethodVectors    = ['label','path','onError','propValue','model','required'];
     this.customValidators    = customValidators;
     this.validate            = this.validate.bind(this);
+    this.trim                = this.trim.bind(this);
   }
 
   //validation helpers
@@ -74,8 +77,6 @@ module.exports = class Pineapple {
     } else { throw Error(`Unable to find method relevant with: ${typeName}`)}
   }
   _oneOf(vo){
-    if(vo.oneOf == "$options" && vo.options) vo.oneOf = vo.options.map(i=>i.value);
-    console.log(vo.oneOf)
     return vo.oneOf.includes(vo.propValue)
   }
   _length(vo){
@@ -133,8 +134,11 @@ module.exports = class Pineapple {
       if(this.isArray(vo.items)){
         //call validate again
         for(let i=0; i<vo.propValue.length; i++){
-          errorObject = await this.validate(vo.propValue[i], vo.items);
-
+          if(!this.isObject(vo.propValue[i])){
+            errorObject = [this.createErrorObj('type', vo)];
+          } else {
+            errorObject = await this.validate(vo.propValue[i], vo.items);
+          }
           /** because validating array of object recursively calls validate
            * we need to reference back to the parent the index of errored item. so if the errorObject contains index
            * it means that the index needs to be added to the parent log and
@@ -150,6 +154,10 @@ module.exports = class Pineapple {
         }
 
       } else {
+        /** if object the elements under  */
+        if(vo.items.items || vo.items.path) {
+          throw Error('use array of items if it is an array of objects. path and items are not applicable in simple array elements');
+        }
 
         let validationVectors = this.getValidationVectors(vo.items)
 
@@ -181,6 +189,7 @@ module.exports = class Pineapple {
 
       }
     } else {
+      /** items are only available for arrays */
       throw Error(`Unable to validate items under path ${vo.path} because it is not an Array`);
     }
 
@@ -203,27 +212,14 @@ module.exports = class Pineapple {
 
   }
 
-  /**
-  finds value of a specifc prop from object
-  using path
-  */
-  getDeepValue(obj,path){
 
-    for (var i=0, path=path.split('.'), len=path.length; i<len; i++){
-      var level = obj[path[i]];
-      if(!level)return null;
-      obj = level;
-    };
-    return obj;
-
-  }
 
   /**
   extracts validation model from predefined
   validation scheme
   */
   getExactValidationModel(modelName){
-    return this.models.filter(i=>i.key==modelName)[0]
+    return this.models[modelName];
   }
 
   /** merge incoming model with baseModel */
@@ -284,17 +280,26 @@ module.exports = class Pineapple {
   async evaluate(obj, ivm, isItems){
 
     let inValidationModel    = ivm;
-    let baseValidationModel  = this.getExactValidationModel(inValidationModel.model);
+    let vo                   = inValidationModel;
+    if(inValidationModel.model){
+      let baseValidationModel  = this.getExactValidationModel(inValidationModel.model);
+      if(!baseValidationModel){
+        throw Error(`unable to find model ${inValidationModel.model}`);
+        return;
+      }
+      /** if evaulating items  */
+      if(isItems)baseValidationModel = baseValidationModel.items;
 
-    if(isItems)baseValidationModel = baseValidationModel.items;
-
-    //mergine the global and the specific
-    let vo                   = this.mergeModels(baseValidationModel, inValidationModel);
+      //mergine the global and the specific
+      vo   = this.mergeModels(baseValidationModel, inValidationModel);
+      
+    }
 
     //fallback to key if pathnot found;
     if(!vo.path)vo.path=vo.key;
     //items already have propValue
-    vo.propValue = this.getDeepValue(obj, vo.path);
+    /** get the deep value path */
+    vo.propValue = lodash.get(obj, vo.path);
 
     if(vo.required && (this.isNull(vo.propValue)||this.isUndefined(vo.propValue))){
       return this.createErrorObj('required', vo);
@@ -325,7 +330,6 @@ module.exports = class Pineapple {
     Passes every property and its validation to the evaluate
   */
   async validate(obj, validationModels){
-    console.log('hit-x')
     let errors = [];
      for(let i=0; i<validationModels.length; i++){
        let error = await this.evaluate(obj, validationModels[i]);
@@ -336,6 +340,37 @@ module.exports = class Pineapple {
      } else { 
        return false;
      }
+  }
+
+  async trim(obj, validationModels){
+    let trimmed = {};
+    for(let i=0; i<validationModels.length; i++){
+      let vo = validationModels[i];
+      if(validationModels[i].model && this.models[validationModels[i].model]){
+        vo = {...this.models[validationModels[i].model], ...validationModels[i]};
+      }
+      if(vo.items){
+        if(this.isArray(vo.items)){
+
+          let schema = vo.items;
+          let value = lodash.get(obj, vo.path);
+
+          for(let x=0; x<value.length; x++){
+            /** item is an Object with multiple props  */
+            lodash.set(trimmed, `${vo.path}[${x}]`, await this.trim(value[x], schema));
+          }
+          
+        } else {
+          /** items is an Array of specific non object */
+          let value = lodash.get(obj, vo.path);
+          if(value) lodash.set(trimmed, vo.path, value);
+        }
+      } else {
+        let value = lodash.get(obj, vo.path);
+        if(value) lodash.set(trimmed, vo.path, value)
+      }
+    }
+    return trimmed;
   }
 }
 

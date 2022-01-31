@@ -10,57 +10,132 @@ advanced json object validator specially designed to validate user json input an
 
 # Simple Usuage
 
-create a validation schema is an array of object containing validation models.
-every model defines set of rules than need to be valid
-on a property that will be defined.
 ```
-const validationSchema = [
-    {
+let Pineapple = require('../index.js');
+let pine = new Pineapple();
 
-        model: 'fullname',
-        required: true,
-        label: 'Fullname',
-        type: 'String',
-        length: {min: 3, max:100},
-        regex: /^([a-zA-Z0-9\s]{3,100})$/,
+const run = async ()=>{
+    let schema = [
+        /** will fail in length */
+        {
+          path: 'user.firstname',
+          label: 'First Name',
+          length: { min:3 , max: 8 },
+        },
+        /** will fail in regex*/
+        {
+            path: 'user.email',
+            label: 'Email',
+            regex: '^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$',
+        },
+        /** will fail in type */
+        {
+            path: 'user.age',
+            label: 'Age',
+            type: 'Number',
+        },
+        /** will fail in option */
+        {
+            path: 'user.gender',
+            oneOf: ['male','female'],
+            required: true,
+        },
+        /** will fail in reqiured */
+        {
+            path: 'user.licenseId',
+            label: 'license Id',
+            required: true,
+        }
+      ]
+      
+      let payload = {
+        user: {
+            firstname: 'bahi hussein abdel baset',
+            email: 'jumbo@mumbo@shit',
+            age: 'twelve',
+            gender: 'monkey',
+        }
+      }
+      
+      let error = await pine.validate(payload, schema);
+      if(error){
+        console.log(error);
 
-    },
-];
+        /*** OUTPUT
+          [
+            {
+                label: 'First Name',
+                path: 'user.firstname',
+                message: 'First Name has invalid length',
+                log: '_length',
+                errors: []
+            },
+            {
+                label: 'Age',
+                path: 'user.age',
+                message: 'Age invalid type',
+                log: '_type',
+                errors: []
+            },
+            {
+                label: 'user.gender',
+                path: 'user.gender',
+                message: 'user.gender invalid option',
+                log: '_oneOf',
+                errors: []
+            },
+            {
+                label: 'license Id',
+                path: 'user.licenseId',
+                message: 'license Id is required',
+                log: '_required',
+                errors: []
+            }
+            ]
+         */
+      }
+}
 
-let pineapple = new Pineapple(validationSchema);  //create an instance with the defined schema list
 
-let userInput = {
-  user: {
-    name: '@Ft~U64l 4o94V'
+run();
+```
+
+### Using validation models to avoid repetition 
+
+validation models can be used to define validation object that 
+can be used in multiple schemes
+
+```
+const models = {
+  id: {
+    type: 'string'
+    regex: '^[a-f\d]{24}$'
   }
-};
+}
 
-let modelReference = {
-  model: 'fullname',
-  path: 'user.name'
-};
+pine = Pine({models});
 
-let errors = pineapple.validate(userInput, modelReference);
-
-console.log(errors);
-
-```
-
-the error result
-
-```
-/**
-[
- {
-   label: 'Fullname',
-   path: 'user.name',
-   message: 'Fullname has invalid format',
-   log: '_regex',
-   errors: []
- }
+let schema1 = [
+  {
+    path: 'user.id',
+    model: 'id'
+  },
 ]
-*/
+
+let schema2 = [
+  {
+    path: 'product.id',
+    model: 'id'
+  }
+]
+
+pine.validate(obj1, schema1);
+pine.validate(obj2, schema2);
+
+this will simply compine {...model, ...schemaObject}
+
 ```
+
 
 # Validation Props
 
@@ -194,7 +269,7 @@ let modelReference = [
   { model: 'books',  path: 'user.books' },
 ]
 
-let pineapple = new Pineapple(validationModels);
+let pineapple = new Pineapple({models: validationModels});
 
 let result = pineapple.validate(userInput, modelReference);
 
@@ -268,3 +343,41 @@ console.log(JSON.stringify(result))
 ]
 
 ```
+
+## Methods
+
+* validate(payload, schema) validates object against schema 
+* trim(payload, schema) trim's the object to match schema requirments
+
+# custom validator 
+```
+const blockPine = new Pineapple({
+    models,
+    customValidators: {
+    'switch': (data)=>{
+        let switchKeys = Object.keys(data);
+        let valid = true;
+        for(let i=0; i<switchKeys.length; i++){
+            if(typeof data[switchKeys[i]] !== "boolean"){
+                valid = false;
+                break;
+            }
+        }
+        return valid;
+    },
+    counter: (data)=>{
+        let counterKeys = Object.keys(data);
+        let valid = true;
+        for(let i=0; i<counterKeys.length; i++){
+            if(!_.isNumber(data[counterKeys[i]])){
+                valid = false;
+                break;
+            }
+        }
+        return valid;
+    }
+}});
+
+```
+
+it can be used in the schema with prop custom:<custom validator link>
