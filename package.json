@@ -1,6 +1,6 @@
 {
   "name": "qantra-pineapple",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "advanced json object validator specially designed to validate user json input and return readable error messages",
   "main": "index.js",
   "scripts": {
