@@ -105,7 +105,6 @@ module.exports = class Pineapple {
     return (new RegExp(vo.regex).test(vo.propValue))
   }
   async _custom(vo){
-    // console.log(vo, '==================xxxxxxxx==============================');
 
     if(this.customValidators[vo.custom]){
       try {
@@ -233,7 +232,7 @@ module.exports = class Pineapple {
 
   /** merge incoming model with baseModel */
   mergeModels(baseModel, inModel){
-    let merged = lodash.merge(baseModel, inModel);
+    let merged = lodash.merge(inModel, baseModel);
     return merged;
   }
 
