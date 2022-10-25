@@ -8,6 +8,12 @@ advanced json object validator specially designed to validate user json input an
 
 ```npm install qantra-pineapple```
 
+# Change Log
+* Starting from version 1.0.9, validators can return true, false or value. 
+if value is returned it will override the real object value in the same exact path 
+when the trim/format function is called. this feature has been tested on none array values 
+and is yet to be implemented for array values
+
 # Simple Usuage
 
 ```

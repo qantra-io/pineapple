@@ -1,4 +1,3 @@
-const { load } = require('debug/src/browser');
 const { times } = require('lodash');
 const lodash = require('lodash');
 const debug  = require('debug')('qantra:pineapple');
@@ -32,6 +31,7 @@ module.exports = class Pineapple {
     this.customValidators    = customValidators;
     this.validate            = this.validate.bind(this);
     this.trim                = this.trim.bind(this);
+    this.formatted            = {}
   }
 
   //validation helpers
@@ -105,9 +105,18 @@ module.exports = class Pineapple {
     return (new RegExp(vo.regex).test(vo.propValue))
   }
   async _custom(vo){
+    // console.log(vo, '==================xxxxxxxx==============================');
+
     if(this.customValidators[vo.custom]){
       try {
-        return (await this.customValidators[vo.custom](vo.propValue));
+        let result =  (await this.customValidators[vo.custom](vo.propValue));
+        if (typeof variable == "boolean") {
+          return result;
+        } else {
+          /** it will return true and will overright the value */
+          this.formatted[vo.path]=result;
+          return true;
+        }
       } catch(err){
         console.error(`Error: custom validator ( ${vo.custom} )  has triggered error: ${err.toString()}`);
         return false;
@@ -366,11 +375,20 @@ module.exports = class Pineapple {
           if(value) lodash.set(trimmed, vo.path, value);
         }
       } else {
-        let value = lodash.get(obj, vo.path);
+        let value = null;
+        if(this.formatted[vo.path]){
+            value = this.formatted[vo.path]
+        } else {
+            value = lodash.get(obj, vo.path);
+        }
         if(value) lodash.set(trimmed, vo.path, value)
       }
     }
     return trimmed;
+  }
+
+  async format(...args){
+    return await this.trim(...args);
   }
 }
 
