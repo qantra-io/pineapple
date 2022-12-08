@@ -19,7 +19,7 @@ const run = async ()=>{
         {
             path: 'user.age',
             label: 'Age',
-            type: 'Number',
+            type: 'Number|String',
         },
         /** will fail in option */
         {
@@ -37,10 +37,11 @@ const run = async ()=>{
       
       let payload = {
         user: {
-            firstname: 'bahi hussein abdel baset',
+            firstname: 'bahi',
             email: 'jumbo@mumbo@shit',
-            age: 'twelve',
-            gender: 'monkey',
+            age: false,
+            gender: 'male',
+            licenseId: '123456789',
         }
       }
       
