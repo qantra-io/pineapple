@@ -109,7 +109,7 @@ module.exports = class Pineapple {
     if(this.customValidators[vo.custom]){
       try {
         let result =  (await this.customValidators[vo.custom](vo.propValue));
-        if (typeof variable == "boolean") {
+        if (typeof result == "boolean") {
           return result;
         } else {
           /** it will return true and will overright the value */
