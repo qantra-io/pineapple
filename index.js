@@ -237,7 +237,7 @@ module.exports = class Pineapple {
   /** creates the returned error object */
   createErrorObj(validationVectorName, vo, result={}){
     let vv        = vo.vector || validationVectorName;
-    let label     = vo.label || vo.path || '';
+    let label     = vo.label || vo.path || 'Undefined label and path';
     let path      = vo.path;
     let log       = `_${validationVectorName}`+ ((vo.index)?` @index(${vo.index})`:'') + ((result.index)?` @index(${result.index})`:'');
     let message   = ( (vo.onError && vo.onError[vv] )   || this.errorSchema.onError[vv] || '').replace(this.errorSchema.marker, label);
