@@ -230,7 +230,7 @@ module.exports = class Pineapple {
 
   /** merge incoming model with baseModel */
   mergeModels(baseModel, inModel){
-    let merged = lodash.merge(inModel, baseModel);
+    let merged = lodash.merge(baseModel, inModel);
     return merged;
   }
 
