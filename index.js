@@ -21,7 +21,7 @@ const defaultErrorSchema = {
 module.exports = class Pineapple {
 
   constructor({
-    models=[], 
+    models={}, 
     errorSchema = defaultErrorSchema,
     customValidators = {},
   }={}){
@@ -109,7 +109,7 @@ module.exports = class Pineapple {
     if(this.customValidators[vo.custom]){
       try {
         let result =  (await this.customValidators[vo.custom](vo.propValue));
-        if (typeof variable == "boolean") {
+        if (typeof result == "boolean") {
           return result;
         } else {
           /** it will return true and will overright the value */
@@ -220,8 +220,6 @@ module.exports = class Pineapple {
 
   }
 
-
-
   /**
   extracts validation model from predefined
   validation scheme
@@ -291,6 +289,7 @@ module.exports = class Pineapple {
     let vo                   = inValidationModel;
     if(inValidationModel.model){
       let baseValidationModel  = this.getExactValidationModel(inValidationModel.model);
+      /** throw error if referenced a model that does not exists */
       if(!baseValidationModel){
         throw Error(`unable to find model ${inValidationModel.model}`);
         return;
