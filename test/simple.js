@@ -1,5 +1,20 @@
 let Pineapple = require('../index.js');
-let pine = new Pineapple();
+const models = {
+      fullname: {
+        type: 'string',
+        custom: 'fullname',
+        depndent: 'user.age',
+        customError: 'you must enter full name'
+      },
+    }
+  
+let pine = new Pineapple({models, customValidators: { 
+    fullname: (data, vm) => {
+        if (data.split(' ').length < 3) {
+          return false;
+        }
+        return true;
+      }}});
 
 const run = async ()=>{
     let schema = [
@@ -32,6 +47,24 @@ const run = async ()=>{
             path: 'user.licenseId',
             label: 'license Id',
             required: true,
+        },
+         /** will fail in gte */
+        {
+            path: 'user.workExperience',
+            label: 'work experience',
+            gte: 1,
+        },
+          /** will fail in lte */
+        {
+            path: 'user.sallary',
+            label: 'sallary',
+            lte: 5000,
+        },
+        /** will fail in custom with custom error message */
+        {
+            path: 'user.fullname',
+            label: 'fullname',
+            model: 'fullname',
         }
       ]
       
@@ -41,6 +74,10 @@ const run = async ()=>{
             email: 'jumbo@mumbo@shit',
             age: 'twelve',
             gender: 'monkey',
+            licenseId: '',
+            workExperience: 0,
+            sallary: 10000,
+            fullname: 'bahi'
         }
       }
       

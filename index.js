@@ -4,6 +4,8 @@ const debug  = require('debug')('qantra:pineapple');
 
 const defaultErrorSchema = {
     marker: '$label',
+    value: '$value',
+    customError : '$customError',
     onError: {
       required: '$label is required',
       length: '$label has invalid length',
@@ -14,7 +16,12 @@ const defaultErrorSchema = {
       exclusive: '$label conflict with other',
       canParse: '$label invalid parsing',
       items: 'one of the $label items is invalid',
-      custom: 'rejected by custom validator',
+      custom: '$customError',
+      gt: '$label must be greater than $value',
+      lt: '$label must be less than $value',
+      gte: '$label must be greater than or equal $value',
+      lte: '$label must be less than or equal $value',
+      
     }
 }
 
@@ -31,7 +38,8 @@ module.exports = class Pineapple {
     this.customValidators    = customValidators;
     this.validate            = this.validate.bind(this);
     this.trim                = this.trim.bind(this);
-    this.formatted            = {}
+    this.formatted           = {}
+    this.validationModels    = {}
   }
 
   //validation helpers
@@ -108,7 +116,8 @@ module.exports = class Pineapple {
 
     if(this.customValidators[vo.custom]){
       try {
-        let result =  (await this.customValidators[vo.custom](vo.propValue));
+        let result =  (await this.customValidators[vo.custom](vo.propValue, this.validationModels));
+        vo.customError = vo.customError || 'rejected by custom validator';
         if (typeof result == "boolean") {
           return result;
         } else {
@@ -220,6 +229,52 @@ module.exports = class Pineapple {
 
   }
 
+  _gt(vo){
+
+    let propValue   = vo.propValue;
+
+    let valid = true;
+
+    if(this.isNumber(propValue) && vo.gt && valid){
+      valid = (propValue > vo.gt);
+    }
+    
+    return valid;
+  }
+  _lt(vo){
+    let propValue   = vo.propValue;
+
+    let valid = true;
+
+    if(vo.lt && valid){
+      valid = (propValue < vo.lt);
+    }
+    
+    return valid;
+  }
+  _gte(vo){
+
+    let propValue   = vo.propValue;
+
+    let valid = true;
+
+    if(this.isNumber(propValue) && vo.gte && valid){
+      valid = (propValue >= vo.gte);
+    }
+    
+    return valid;
+  }
+  _lte(vo){
+    let propValue   = vo.propValue;
+
+    let valid = true;
+
+    if(vo.lte && valid){
+      valid = (propValue <= vo.lte);
+    }
+    
+    return valid;
+  }
   /**
   extracts validation model from predefined
   validation scheme
@@ -238,9 +293,13 @@ module.exports = class Pineapple {
   createErrorObj(validationVectorName, vo, result={}){
     let vv        = vo.vector || validationVectorName;
     let label     = vo.label || vo.path || 'Undefined label and path';
+    let value     = vo[validationVectorName];
     let path      = vo.path;
     let log       = `_${validationVectorName}`+ ((vo.index)?` @index(${vo.index})`:'') + ((result.index)?` @index(${result.index})`:'');
-    let message   = ( (vo.onError && vo.onError[vv] )   || this.errorSchema.onError[vv] || '').replace(this.errorSchema.marker, label);
+    let message   = ( (vo.onError && vo.onError[vv] )   || this.errorSchema.onError[vv] || '')
+                    .replace(this.errorSchema.marker, label)
+                    .replace(this.errorSchema.value, value)
+                    .replace(this.errorSchema.customError, vo.customError);
     return {label, path, message, log, errors:result.errors||[]}
   }
 
@@ -308,7 +367,7 @@ module.exports = class Pineapple {
     /** get the deep value path */
     vo.propValue = lodash.get(obj, vo.path);
 
-    if(vo.required && (this.isNull(vo.propValue)||this.isUndefined(vo.propValue))){
+    if(vo.required && (this.isNull(vo.propValue)||this.isUndefined(vo.propValue) || vo.propValue == '')){
       return this.createErrorObj('required', vo);
     }
     //if not required and it is passed by null then we will not containue valudtion 
@@ -337,6 +396,7 @@ module.exports = class Pineapple {
     Passes every property and its validation to the evaluate
   */
   async validate(obj, validationModels){
+    this.validationModels = validationModels;
     let errors = [];
      for(let i=0; i<validationModels.length; i++){
        let error = await this.evaluate(obj, validationModels[i]);
