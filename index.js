@@ -357,7 +357,7 @@ module.exports = class Pineapple {
       if(isItems)baseValidationModel = baseValidationModel.items;
 
       //mergine the global and the specific
-      vo   = this.mergeModels(baseValidationModel, inValidationModel);
+      vo   = this.mergeModels({...baseValidationModel}, inValidationModel);
       
     }
 
@@ -367,7 +367,7 @@ module.exports = class Pineapple {
     /** get the deep value path */
     vo.propValue = lodash.get(obj, vo.path);
 
-    if(vo.required && (this.isNull(vo.propValue)||this.isUndefined(vo.propValue) || vo.propValue == '')){
+    if(vo.required && (this.isNull(vo.propValue)||this.isUndefined(vo.propValue) || vo.propValue === '')){
       return this.createErrorObj('required', vo);
     }
     //if not required and it is passed by null then we will not containue valudtion 
