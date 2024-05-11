@@ -430,7 +430,7 @@ module.exports = class Pineapple {
         } else {
           /** items is an Array of specific non object */
           let value = lodash.get(obj, vo.path);
-          if(value) lodash.set(trimmed, vo.path, value);
+          if(value!=null && value !='undefined') lodash.set(trimmed, vo.path, value);
         }
       } else {
         let value = null;
@@ -439,7 +439,7 @@ module.exports = class Pineapple {
         } else {
             value = lodash.get(obj, vo.path);
         }
-        if(value) lodash.set(trimmed, vo.path, value)
+        if(value!=null && value !='undefined') lodash.set(trimmed, vo.path, value)
       }
     }
     return trimmed;
