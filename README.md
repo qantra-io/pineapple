@@ -149,6 +149,10 @@ this will simply compine {...model, ...schemaObject}
 * **type**: can be 'string', 'number', 'array', 'object', 'boolean', 'date'
 * **required**: true or false
 * **length**: can be a number or object length: 5 , length: {min: 10, max: 100}
+* **gt**: Validates if a number is greater than the specified value
+* **gte**: Validates if a number is greater than or equal to the specified value.
+* **lt**: Validates if a number is less than the specified value.
+* **lte**: Validates if a number is less than or equal to the specified value.
 * **regex**: takes a regex expression to match
 * **oneOf**: array of string from which the user value must be included ['male','female']
 * **canParse**: takes a string 'int' , 'date' , 'float' check if a value can be parsed.
@@ -386,4 +390,19 @@ const blockPine = new Pineapple({
 
 ```
 
-it can be used in the schema with prop custom:<custom validator link>
+It can be used in the model schema with prop custom:`fullName`
+```
+fullName: {
+        type: 'string',
+        custom: 'fullName',
+      },
+```
+It can provide a custom error message for your validation:
+```
+fullName: {
+        type: 'string',
+        custom: 'fullName',
+        customError:'You must enter the full name'
+      },
+```
+
